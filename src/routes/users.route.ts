@@ -1,34 +1,33 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
-import { DatabaseError } from "pg";
 import userRepository from "../repositories/user.repository";
 
-const userRoute = Router();
+const usersRoute = Router();
 
-userRoute.get(
+usersRoute.get(
   "/users",
   async (req: Request, res: Response, next: NextFunction) => {
+    console.log(req.headers["authorization"]);
+
     const users = await userRepository.findAllUsers();
-    res.status(StatusCodes.OK).send({ users });
+    res.status(StatusCodes.OK).send(users);
   }
 );
 
-userRoute.get(
+usersRoute.get(
   "/users/:uuid",
   async (req: Request<{ uuid: string }>, res: Response, next: NextFunction) => {
-
     try {
       const uuid = req.params.uuid;
-      const user = await userRepository.findbyId(uuid);
-      res.sendStatus(StatusCodes.OK).send(user);
-      
+      const user = await userRepository.findById(uuid);
+      res.status(StatusCodes.OK).send(user);
     } catch (error) {
-      next(error);  
-    } 
+      next(error);
+    }
   }
 );
 
-userRoute.post(
+usersRoute.post(
   "/users",
   async (req: Request, res: Response, next: NextFunction) => {
     const newUser = req.body;
@@ -37,7 +36,7 @@ userRoute.post(
   }
 );
 
-userRoute.put(
+usersRoute.put(
   "/users/:uuid",
   async (req: Request<{ uuid: string }>, res: Response, next: NextFunction) => {
     const uuid = req.params.uuid;
@@ -51,7 +50,7 @@ userRoute.put(
   }
 );
 
-userRoute.delete(
+usersRoute.delete(
   "/users/:uuid",
   async (req: Request<{ uuid: string }>, res: Response, next: NextFunction) => {
     const uuid = req.params.uuid;
@@ -60,4 +59,4 @@ userRoute.delete(
   }
 );
 
-export default userRoute;
+export default usersRoute;
